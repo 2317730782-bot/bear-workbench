@@ -3882,12 +3882,6 @@ function renderReadingPage(container) {
   const expanded = appData._readingExpanded;
   let html = '';
 
-  // 全部刷新
-  html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
-    <span style="font-size:12px;color:var(--text-muted);flex:1">📖 点击栏目展开 · 支持朗读/复制/跳转/刷新</span>
-    <button class="btn btn-secondary" id="refreshAllReading" style="padding:6px 14px;font-size:13px">🔄 全部刷新</button>
-  </div>`;
-
   // 栏目配置 — 折叠面板式
   const sections = [
     { key: 'expression', title: '表达能力（日常/职场）', icon: '🎤', items: ri.expression, render: (t) => `
@@ -3961,6 +3955,14 @@ function renderReadingPage(container) {
       </div>` }
   ];
 
+  // 全部刷新 + 恢复隐藏栏目
+  const hiddenCount = sections.filter(s => reading[s.key] && reading[s.key].visible === false).length;
+  html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--text-muted);flex:1;min-width:120px">📖 点击栏目展开 · 支持朗读/复制/跳转/刷新</span>
+    <button class="btn btn-secondary" id="refreshAllReading" style="padding:6px 14px;font-size:13px">🔄 全部刷新</button>
+    ${hiddenCount > 0 ? `<button class="btn btn-secondary" id="restoreReadingSections" style="padding:6px 14px;font-size:13px">👁️ 恢复${hiddenCount}个隐藏栏目</button>` : ''}
+  </div>`;
+
   sections.forEach(sec => {
     const isVisible = !reading[sec.key] || reading[sec.key].visible !== false;
     if (!isVisible) return;
@@ -3971,7 +3973,7 @@ function renderReadingPage(container) {
         <div style="display:flex;gap:6px;align-items:center">
           <span style="font-size:11px;color:var(--text-muted)">${isExpanded ? '▼' : '▶'}</span>
           <button class="reading-toggle" data-section="${sec.key}" data-action="refresh" style="font-size:14px" onclick="event.stopPropagation()">🔄</button>
-          <button class="reading-toggle" data-section="${sec.key}" style="font-size:11px;padding:3px 8px" onclick="event.stopPropagation()">隐藏</button>
+          <button class="reading-toggle" data-section="${sec.key}" data-action="hide" style="font-size:11px;padding:3px 8px" onclick="event.stopPropagation()">隐藏</button>
         </div>
       </div>`;
     if (isExpanded) {
@@ -4020,12 +4022,15 @@ function renderReadingPage(container) {
           showToast('📥 已收藏至收件箱');
         } else if (action === 'analyzeImpact') {
           showImpactModal(btn.dataset.title, btn.dataset.impact);
-        } else if (section) {
+        } else if (action === 'hide' && section) {
           if (!appData.reading[section]) appData.reading[section] = {};
           appData.reading[section].visible = false;
+          if (appData._readingExpanded === section) appData._readingExpanded = null;
           saveData();
           renderPage('reading');
           showToast('栏目已隐藏');
+        } else if (section) {
+          // 兜底：旧版无 action 的隐藏按钮，不再触发隐藏，避免误操作
         }
       });
     });
@@ -4043,6 +4048,15 @@ function renderReadingPage(container) {
       saveData();
       renderPage('reading');
       showToast('✨ 全部刷新！');
+    });
+
+    document.getElementById('restoreReadingSections')?.addEventListener('click', () => {
+      ['expression', 'morningNews', 'news', 'books', 'aiVideos', 'podcasts', 'finance'].forEach(k => {
+        if (appData.reading[k]) appData.reading[k].visible = true;
+      });
+      saveData();
+      renderPage('reading');
+      showToast('✅ 已恢复所有隐藏栏目');
     });
   }, 0);
 }
