@@ -1856,18 +1856,117 @@ function showAddTemplateModal() {
 // ========== INSPIRATION ==========
 // 博主数据库 — 包含素人爆款、好物种草、宅家氛围感等多元类型
 const bloggerAnalysisDB = [
-  { name: '数码小钢炮', followers: '12.3w', niche: '数码评测', style: '硬核参数+真实体验', tags: ['数码', '评测', '对比'], bestContent: '千元机和旗舰机拍照盲测，用样张说话', takeaway: '数据可视化 + 真实场景对比，比纯参数更有说服力', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=数码小钢炮' },
-  { name: '书桌日常', followers: '8.7w', niche: '桌面布置', style: '治愈系暖色调', tags: ['桌面', '布置', '好物'], bestContent: '300元改造出租屋书桌，附购物清单', takeaway: '低成本改造 + 购物链接 = 高转化收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=书桌日常布置' },
-  { name: '出行小达人', followers: '15.1w', niche: '旅行好物', style: '实用主义+清单体', tags: ['出行', '好物', '清单'], bestContent: '出差一周只带一个背包的秘密', takeaway: '极限收纳挑战类内容互动率最高', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=出行好物清单' },
-  { name: '美妆情报局', followers: '22.6w', niche: '美妆护肤', style: '成分党+测评', tags: ['美妆', '护肤', '成分'], bestContent: '2024年度空瓶记，真正用完才推荐', takeaway: '长期使用才推荐建立信任感，年度盘点流量大', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=美妆成分测评' },
-  { name: '猫奴日记', followers: '6.2w', niche: '宠物用品', style: '温馨日常+干货', tags: ['宠物', '猫咪', '用品'], bestContent: '养猫第一年花了多少钱？附详细账单', takeaway: '真实花销清单类内容引发共鸣，评论区活跃度高', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=养猫好物分享' },
-  { name: '效率研究所', followers: '9.8w', niche: '效率工具', style: '极简风+对比测评', tags: ['效率', '工具', 'App'], bestContent: '我删掉了80%的App，只留下这10个', takeaway: '反向筛选/断舍离视角比常规推荐更有记忆点', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=效率工具推荐' },
-  { name: '宅家小确幸', followers: '3.8w', niche: '宅家生活', style: '氛围感+治愈日常', tags: ['宅家', '氛围感', '生活'], bestContent: '一个人的周末宅家vlog，治愈到哭', takeaway: '氛围感+ASMR收音+慢节奏剪辑 = 治愈系流量密码', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=宅家氛围感vlog' },
-  { name: '小厨房日记', followers: '4.5w', niche: '宅家美食', style: '一人食+治愈系', tags: ['美食', '一人食', '宅家'], bestContent: '下班后给自己做一顿治愈晚餐', takeaway: '暖光+特写镜头+生活化文案，美食也能拍出电影感', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=一人食治愈美食' },
-  { name: '沙发土豆', followers: '2.9w', niche: '宅家娱乐', style: '轻松搞笑+真实', tags: ['宅家', '娱乐', '追剧'], bestContent: '宅家周末的12时辰', takeaway: '真实+自嘲式内容容易引发共鸣，素人感是关键', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=宅家周末日常' },
-  { name: '种草小能手', followers: '1.2w', niche: '好物种草', style: '图文清单+真实体验', tags: ['好物', '种草', '平价'], bestContent: '拼多多上真的能买到好东西？亲测20件', takeaway: '反认知选题+真实测评，素人小号也能出爆款', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=平价好物种草' },
-  { name: '生活小剧场', followers: '8.6k', niche: '生活好物', style: '场景化展示', tags: ['好物', '生活', '场景'], bestContent: '提升幸福感的10件百元好物', takeaway: '数字+幸福感+低价 = 高收藏率，素人起步首选选题', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=提升幸福感好物' },
-  { name: '治愈系书桌', followers: '5.1w', niche: '桌面美学', style: '极简+氛围感', tags: ['桌面', '美学', '极简'], bestContent: '我的书桌进化史｜从杂乱到治愈', takeaway: '前后对比+成长叙事，氛围感博主常用结构', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=治愈系书桌布置' }
+  { name: '卧室改造家', followers: '8.2w', niche: '卧室布置', style: '暖光氛围感+改造前后对比', tags: ['卧室', '改造', '好物'], bestContent: '出租屋卧室100元改造前后对比', takeaway: '改造前后对比+花费明细=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('卧室改造家') },
+  { name: '小窝整理师', followers: '12.5w', niche: '居家收纳', style: '收纳技巧+好物推荐', tags: ['收纳', '整理', '家居'], bestContent: '衣柜整理5步法｜小户型必看', takeaway: '教程类内容收藏率极高', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('小窝整理师') },
+  { name: '卧室美学馆', followers: '6.8w', niche: '卧室美学', style: '极简暖色调图文', tags: ['卧室', '美学', '极简'], bestContent: '我的卧室好物清单｜每件都用了半年以上', takeaway: '真实使用时长增加信任感', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('卧室美学馆') },
+  { name: '出租屋自救指南', followers: '15.3w', niche: '租房改造', style: '低成本+不动墙改造', tags: ['租房', '改造', '平价'], bestContent: '租房党不动墙改造方案大全', takeaway: '痛点精准+解决方案实用', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('出租屋自救指南') },
+  { name: '独居好物研究所', followers: '9.1w', niche: '独居好物', style: '清单体+真实使用场景', tags: ['独居', '好物', '清单'], bestContent: '独居三年买过最值的20件好物', takeaway: '数字+真实使用周期=高转化', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('独居好物研究所') },
+  { name: '抠搜好物挖掘机', followers: '4.2w', niche: '平价好物', style: '低价好物挖掘+真实测评', tags: ['平价', '好物', '测评'], bestContent: '拼多多10元以内好物大赏', takeaway: '反认知平台+低价=话题性', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('抠搜好物挖掘机') },
+  { name: '9.9好物猎人', followers: '2.8w', niche: '低价好物', style: '价格对比+真实体验', tags: ['平价', '种草', '价格'], bestContent: '9.9包邮真的能买到好东西？', takeaway: '价格悬念+真实测评', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('9.9好物猎人') },
+  { name: '百元好物图鉴', followers: '7.5w', niche: '百元好物', style: '图文清单+场景化展示', tags: ['好物', '百元', '清单'], bestContent: '100元买齐卧室提升幸福感好物', takeaway: '预算明确+场景化=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('百元好物图鉴') },
+  { name: '抠门女孩的快乐', followers: '5.6w', niche: '省钱好物', style: '省钱攻略+好物分享', tags: ['省钱', '好物', '攻略'], bestContent: '月薪3000也能拥有的快乐好物', takeaway: '收入共鸣+低价好物', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('抠门女孩的快乐') },
+  { name: '便宜好物不踩雷', followers: '3.9w', niche: '平价测评', style: '避雷+种草双线', tags: ['平价', '避雷', '测评'], bestContent: '淘宝便宜好物红黑榜', takeaway: '红黑榜形式=互动率高', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('便宜好物不踩雷') },
+  { name: '整理收纳师小C', followers: '18.6w', niche: '整理收纳', style: '专业收纳+教程', tags: ['收纳', '整理', '教程'], bestContent: '日本收纳师教我的衣柜整理法', takeaway: '专业背书+教程类=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('整理收纳师小C') },
+  { name: '极简生活实验室', followers: '11.2w', niche: '极简生活', style: '断舍离+极简好物', tags: ['极简', '断舍离', '生活'], bestContent: '我扔掉了80%的东西后', takeaway: '断舍离叙事+前后对比', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('极简生活实验室') },
+  { name: '小户型收纳攻略', followers: '8.9w', niche: '小户型收纳', style: '收纳神器实测', tags: ['收纳', '小户型', '好物'], bestContent: '10个收纳神器真实测评', takeaway: '实测类+数字清单', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('小户型收纳攻略') },
+  { name: '厨房收纳达人', followers: '6.3w', niche: '厨房收纳', style: '厨房整理+好物', tags: ['厨房', '收纳', '整理'], bestContent: '3平米厨房收纳改造全过程', takeaway: '小空间+改造过程=高完播', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('厨房收纳达人') },
+  { name: '冰箱整理专家', followers: '5.7w', niche: '冰箱收纳', style: '冰箱整理+食材管理', tags: ['冰箱', '收纳', '食材'], bestContent: '一周食材冰箱收纳法', takeaway: '实用+可复制=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('冰箱整理专家') },
+  { name: '抽屉收纳研究所', followers: '3.1w', niche: '收纳技巧', style: '抽屉分区+收纳好物', tags: ['收纳', '抽屉', '技巧'], bestContent: '抽屉收纳分区大法', takeaway: '技巧类+图文教程', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('抽屉收纳研究所') },
+  { name: '自媒体成长日记', followers: '22.4w', niche: '自媒体运营', style: '涨粉攻略+变现分享', tags: ['自媒体', '涨粉', '变现'], bestContent: '0到10万粉我用对了这些方法', takeaway: '成长叙事+方法论=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('自媒体成长日记') },
+  { name: '小红书运营研究所', followers: '16.8w', niche: '平台运营', style: '数据分析+爆款拆解', tags: ['运营', '小红书', '爆款'], bestContent: '拆解100篇爆款笔记的共同点', takeaway: '数据拆解+规律总结', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('小红书运营研究所') },
+  { name: '剪辑技能树', followers: '13.2w', niche: '视频剪辑', style: '剪辑教程+技巧', tags: ['剪辑', '教程', '技巧'], bestContent: '3分钟学会电影感转场', takeaway: '教程类+短时间=高完播', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('剪辑技能树') },
+  { name: '手机摄影研究所', followers: '19.5w', niche: '手机摄影', style: '拍摄技巧+调色', tags: ['摄影', '手机', '调色'], bestContent: '手机拍出电影感的5个技巧', takeaway: '技巧类+效果对比', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手机摄影研究所') },
+  { name: '短视频脚本工坊', followers: '8.7w', niche: '脚本创作', style: '脚本模板+拆解', tags: ['脚本', '创作', '模板'], bestContent: '爆款短视频脚本万能公式', takeaway: '模板+公式=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('短视频脚本工坊') },
+  { name: '封面设计研究所', followers: '7.3w', niche: '封面设计', style: '封面技巧+模板', tags: ['封面', '设计', '模板'], bestContent: '高点击率封面的3个秘密', takeaway: '技巧+对比=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('封面设计研究所') },
+  { name: '文案灵感库', followers: '10.6w', niche: '文案写作', style: '爆款文案拆解', tags: ['文案', '写作', '爆款'], bestContent: '让点击率翻倍的标题公式', takeaway: '公式+案例=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('文案灵感库') },
+  { name: '涨粉实验室', followers: '14.1w', niche: '涨粉策略', style: '涨粉方法+数据分析', tags: ['涨粉', '运营', '数据'], bestContent: '30天涨粉1万实操记录', takeaway: '实操记录+数据=可信度', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('涨粉实验室') },
+  { name: '变现实战日记', followers: '9.8w', niche: '自媒体变现', style: '变现方法+真实收入', tags: ['变现', '收入', '自媒体'], bestContent: '小红书变现的7种方式', takeaway: '方法+真实数据=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('变现实战日记') },
+  { name: '拍摄布光小课堂', followers: '6.4w', niche: '拍摄布光', style: '布光教程+设备推荐', tags: ['拍摄', '布光', '教程'], bestContent: '100元搞定拍摄布光', takeaway: '低成本+教程=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('拍摄布光小课堂') },
+  { name: '手帐生活研究所', followers: '12.7w', niche: '手帐排版', style: '手帐排版+文具好物', tags: ['手帐', '排版', '文具'], bestContent: '手帐排版7种风格合集', takeaway: '合集类+风格多变=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手帐生活研究所') },
+  { name: '文具控的日常', followers: '8.4w', niche: '文具好物', style: '文具测评+种草', tags: ['文具', '测评', '好物'], bestContent: '用过的20支笔真实测评', takeaway: '测评类+数量多=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('文具控的日常') },
+  { name: '手帐素材铺', followers: '5.9w', niche: '手帐素材', style: '素材分享+排版教程', tags: ['手帐', '素材', '教程'], bestContent: '免费手帐素材包分享', takeaway: '免费资源=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手帐素材铺') },
+  { name: '极简手帐日记', followers: '7.1w', niche: '极简手帐', style: '极简排版+好物', tags: ['手帐', '极简', '排版'], bestContent: '一周极简手帐排版', takeaway: '系列内容+极简风=高粘性', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('极简手帐日记') },
+  { name: '文具开箱日记', followers: '4.6w', niche: '文具开箱', style: '开箱+真实使用', tags: ['文具', '开箱', '测评'], bestContent: '日本文具店扫货开箱', takeaway: '开箱+异国=高互动', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('文具开箱日记') },
+  { name: '手帐小白成长记', followers: '3.2w', niche: '手帐入门', style: '教程+排版灵感', tags: ['手帐', '入门', '教程'], bestContent: '手帐新手必看的5个排版技巧', takeaway: '入门+技巧=高收藏', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手帐小白成长记') },
+  { name: '国货文具推荐', followers: '2.9w', niche: '国货文具', style: '国货测评+种草', tags: ['文具', '国货', '测评'], bestContent: '国货文具不输日本品牌', takeaway: '国货+对比=话题性', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('国货文具推荐') },
+  { name: '手帐胶带控', followers: '5.3w', niche: '手帐胶带', style: '胶带收纳+使用', tags: ['手帐', '胶带', '收纳'], bestContent: '手帐胶带收纳整理大法', takeaway: '收纳+技巧=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手帐胶带控') },
+  { name: '数码开箱实验室', followers: '25.6w', niche: '数码开箱', style: '硬核开箱+深度体验', tags: ['数码', '开箱', '测评'], bestContent: 'iPhonevs安卓一个月深度体验', takeaway: '对比+长期体验=高可信', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('数码开箱实验室') },
+  { name: '平价数码研究所', followers: '11.3w', niche: '平价数码', style: '低价数码好物', tags: ['数码', '平价', '好物'], bestContent: '百元以内数码配件红黑榜', takeaway: '红黑榜+低价=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('平价数码研究所') },
+  { name: '桌面数码搭配', followers: '9.7w', niche: '桌面数码', style: '桌面搭配+数码好物', tags: ['桌面', '数码', '搭配'], bestContent: '500元搞定桌面数码全家桶', takeaway: '预算+搭配=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('桌面数码搭配') },
+  { name: '数码好物避雷', followers: '7.8w', niche: '数码避雷', style: '避雷+种草', tags: ['数码', '避雷', '测评'], bestContent: '这些数码好物别再买了', takeaway: '避雷+反认知=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('数码好物避雷') },
+  { name: 'iPad生产力', followers: '16.2w', niche: 'iPad使用', style: 'iPad技巧+App推荐', tags: ['iPad', '效率', 'App'], bestContent: 'iPad变成生产力的10个App', takeaway: '技巧+App清单=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('iPad生产力') },
+  { name: '百元数码好物种草', followers: '4.1w', niche: '百元数码', style: '低价数码种草', tags: ['数码', '百元', '种草'], bestContent: '100元以内数码好物大赏', takeaway: '低价+合集=高收藏', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('百元数码好物种草') },
+  { name: '数码配件清单', followers: '6.5w', niche: '数码配件', style: '配件推荐+对比', tags: ['数码', '配件', '对比'], bestContent: '买了10个充电头后的终极推荐', takeaway: '数量+对比=高可信', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('数码配件清单') },
+  { name: '苹果生态玩家', followers: '13.8w', niche: '苹果生态', style: '苹果好物+技巧', tags: ['苹果', '生态', '技巧'], bestContent: '苹果全家桶最省钱搭配方案', takeaway: '省钱+搭配=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('苹果生态玩家') },
+  { name: '一个人的房间', followers: '7.6w', niche: '独居氛围感', style: '暖光+慢节奏vlog', tags: ['独居', '氛围感', 'vlog'], bestContent: '一个人的夜晚｜灯光+音乐+书', takeaway: '氛围感+ASMR=治愈系爆款', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('一个人的房间') },
+  { name: '雨天日记', followers: '4.8w', niche: '氛围感日常', style: '雨声+日常记录', tags: ['氛围感', '日常', 'vlog'], bestContent: '下雨天的独居日常', takeaway: '天气+氛围=情绪共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('雨天日记') },
+  { name: '深夜厨房', followers: '6.2w', niche: '深夜美食', style: '暖光+特写+慢节奏', tags: ['美食', '深夜', '氛围感'], bestContent: '深夜给自己煮一碗面', takeaway: '深夜+美食+氛围=高共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('深夜厨房') },
+  { name: '清晨日记', followers: '5.4w', niche: '早安日常', style: '晨光+日常vlog', tags: ['日常', '早安', '氛围感'], bestContent: '5点起床的独居日常', takeaway: '早起+自律=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('清晨日记') },
+  { name: '周末独处指南', followers: '8.1w', niche: '独处日常', style: '独处+氛围感+好物', tags: ['独处', '氛围感', '好物'], bestContent: '一个人的完美周末', takeaway: '独处+好物=高共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('周末独处指南') },
+  { name: '暖光生活馆', followers: '5.7w', niche: '暖光好物', style: '暖光+好物展示', tags: ['暖光', '好物', '氛围感'], bestContent: '暖光灯好物推荐', takeaway: '氛围感+好物=高转化', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('暖光生活馆') },
+  { name: '独居氛围感日记', followers: '9.3w', niche: '独居氛围', style: '独居+氛围感+vlog', tags: ['独居', '氛围感', 'vlog'], bestContent: '独居女孩的治愈日常', takeaway: '独居+治愈=高共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('独居氛围感日记') },
+  { name: '一个人的晚餐', followers: '6.8w', niche: '一人食', style: '一人食+治愈系', tags: ['美食', '一人食', '治愈'], bestContent: '一个人的晚餐也可以很讲究', takeaway: '一人食+仪式感=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('一个人的晚餐') },
+  { name: '夜晚读书人', followers: '3.9w', niche: '夜读日常', style: '阅读+氛围感', tags: ['阅读', '氛围感', '日常'], bestContent: '深夜读书｜一个人的安静时光', takeaway: '阅读+氛围=文艺共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('夜晚读书人') },
+  { name: '卧室灯光师', followers: '4.5w', niche: '灯光氛围', style: '灯光好物+氛围感', tags: ['灯光', '好物', '氛围感'], bestContent: '卧室灯光改造指南', takeaway: '改造+好物=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('卧室灯光师') },
+  { name: '好物合集铺', followers: '13.4w', niche: '好物合集', style: '合集+清单+真实使用', tags: ['好物', '合集', '清单'], bestContent: '我买过最值的30件好物', takeaway: '数字+合集=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('好物合集铺') },
+  { name: '真实种草不恰饭', followers: '8.7w', niche: '真实种草', style: '真实测评+不广告', tags: ['种草', '真实', '测评'], bestContent: '用了一个月才敢推荐的好物', takeaway: '真实使用+时间背书=信任', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('真实种草不恰饭') },
+  { name: '抠搜女孩好物记', followers: '5.1w', niche: '平价好物', style: '低价好物+省钱', tags: ['平价', '好物', '省钱'], bestContent: '月薪3000的好物清单', takeaway: '收入共鸣+低价=高互动', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('抠搜女孩好物记') },
+  { name: '好物红黑榜', followers: '10.2w', niche: '好物测评', style: '红黑榜+对比', tags: ['好物', '红黑榜', '测评'], bestContent: '网红好物红黑榜｜别再跟风买了', takeaway: '红黑榜+反跟风=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('好物红黑榜') },
+  { name: '空瓶记日记', followers: '6.4w', niche: '空瓶好物', style: '空瓶+真实推荐', tags: ['空瓶', '好物', '真实'], bestContent: '年度空瓶记｜真正用完才推荐', takeaway: '空瓶=真实使用=高信任', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('空瓶记日记') },
+  { name: '宿舍好物研究所', followers: '7.8w', niche: '宿舍好物', style: '宿舍+平价+好物', tags: ['宿舍', '好物', '平价'], bestContent: '学生党宿舍好物清单', takeaway: '学生党+平价=高共鸣', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('宿舍好物研究所') },
+  { name: '打工人好物图鉴', followers: '9.6w', niche: '打工人好物', style: '办公+通勤好物', tags: ['打工人', '好物', '办公'], bestContent: '打工人办公桌好物推荐', takeaway: '人群精准+场景化=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('打工人好物图鉴') },
+  { name: '租房好物不踩雷', followers: '6.9w', niche: '租房好物', style: '租房+平价+好物', tags: ['租房', '好物', '平价'], bestContent: '租房党必买好物清单', takeaway: '租房+好物=高共鸣', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('租房好物不踩雷') },
+  { name: '提升幸福感好物', followers: '11.5w', niche: '幸福感好物', style: '好物+生活仪式感', tags: ['好物', '幸福感', '生活'], bestContent: '提升幸福感的10件小东西', takeaway: '幸福感+数字=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('提升幸福感好物') },
+  { name: '小东西研究所', followers: '4.7w', niche: '创意小物', style: '创意好物+测评', tags: ['好物', '创意', '测评'], bestContent: '淘宝上的神仙小东西', takeaway: '创意+低价=高互动', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('小东西研究所') },
+  { name: '桌面美学研究所', followers: '14.6w', niche: '桌面布置', style: '极简+氛围感桌面', tags: ['桌面', '美学', '布置'], bestContent: '我的桌面好物清单｜极简风', takeaway: '清单+极简=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('桌面美学研究所') },
+  { name: '书桌改造日记', followers: '8.3w', niche: '书桌改造', style: '改造过程+好物', tags: ['书桌', '改造', '好物'], bestContent: '500元书桌改造全过程', takeaway: '改造+预算=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('书桌改造日记') },
+  { name: '电竞桌面搭配', followers: '10.1w', niche: '电竞桌面', style: '电竞+数码+灯光', tags: ['桌面', '电竞', '数码'], bestContent: '5000元搞定电竞桌面', takeaway: '预算+搭配=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('电竞桌面搭配') },
+  { name: '桌面收纳小能手', followers: '6.7w', niche: '桌面收纳', style: '收纳+好物+技巧', tags: ['桌面', '收纳', '好物'], bestContent: '桌面收纳神器推荐', takeaway: '收纳+好物=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('桌面收纳小能手') },
+  { name: '极简桌面日记', followers: '5.2w', niche: '极简桌面', style: '极简+好物', tags: ['桌面', '极简', '好物'], bestContent: '我的极简桌面好物分享', takeaway: '极简+好物=高粘性', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('极简桌面日记') },
+  { name: '一人食厨房', followers: '11.8w', niche: '一人食', style: '一人食+简单 recipe', tags: ['美食', '一人食', '简单'], bestContent: '下班10分钟搞定晚餐', takeaway: '简单+快=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('一人食厨房') },
+  { name: '懒人美食研究所', followers: '9.4w', niche: '懒人美食', style: '简单+懒人+好物', tags: ['美食', '懒人', '好物'], bestContent: '空气炸锅懒人食谱合集', takeaway: '合集+懒人=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('懒人美食研究所') },
+  { name: '厨房好物种草', followers: '7.2w', niche: '厨房好物', style: '厨房工具+测评', tags: ['厨房', '好物', '测评'], bestContent: '厨房必买好物清单', takeaway: '清单+测评=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('厨房好物种草') },
+  { name: '快手早餐日记', followers: '5.8w', niche: '快手早餐', style: '早餐+简单+营养', tags: ['早餐', '简单', '营养'], bestContent: '打工人5分钟早餐方案', takeaway: '快+简单=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('快手早餐日记') },
+  { name: '美食氛围感', followers: '6.6w', niche: '美食氛围', style: '美食+氛围感+拍摄', tags: ['美食', '氛围感', '拍摄'], bestContent: '把外卖拍出米其林感', takeaway: '反差+技巧=高互动', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('美食氛围感') },
+  { name: '胶囊衣橱研究所', followers: '13.7w', niche: '胶囊衣橱', style: '极简穿搭+衣橱整理', tags: ['穿搭', '极简', '衣橱'], bestContent: '30件衣服穿出一整年', takeaway: '极简+数字=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('胶囊衣橱研究所') },
+  { name: '小个子穿搭日记', followers: '10.9w', niche: '小个子穿搭', style: '小个子+显高+穿搭', tags: ['穿搭', '小个子', '显高'], bestContent: '150cm显高穿搭公式', takeaway: '人群精准+公式=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('小个子穿搭日记') },
+  { name: '平价穿搭图鉴', followers: '8.5w', niche: '平价穿搭', style: '平价+穿搭+好物', tags: ['穿搭', '平价', '好物'], bestContent: '百元以内穿搭合集', takeaway: '平价+合集=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('平价穿搭图鉴') },
+  { name: '通勤穿搭研究所', followers: '9.2w', niche: '通勤穿搭', style: '通勤+简约+穿搭', tags: ['穿搭', '通勤', '简约'], bestContent: '一周通勤穿搭不重样', takeaway: '系列+实用=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('通勤穿搭研究所') },
+  { name: '养猫好物研究所', followers: '12.1w', niche: '猫咪好物', style: '猫咪用品+测评', tags: ['宠物', '猫咪', '好物'], bestContent: '养猫好物红黑榜', takeaway: '红黑榜+宠物=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('养猫好物研究所') },
+  { name: '新手养猫指南', followers: '8.6w', niche: '养猫入门', style: '养猫攻略+好物', tags: ['宠物', '猫咪', '攻略'], bestContent: '新手养猫必买清单', takeaway: '攻略+清单=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('新手养猫指南') },
+  { name: '猫粮测评专家', followers: '7.3w', niche: '猫粮测评', style: '猫粮对比+测评', tags: ['宠物', '猫粮', '测评'], bestContent: '10款猫粮深度测评', takeaway: '测评+对比=高信任', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('猫粮测评专家') },
+  { name: '养狗好物分享', followers: '5.9w', niche: '养狗好物', style: '狗狗用品+日常', tags: ['宠物', '狗狗', '好物'], bestContent: '养狗第一年花销清单', takeaway: '花销+清单=高共鸣', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('养狗好物分享') },
+  { name: '独居女孩安全指南', followers: '11.4w', niche: '独居安全', style: '安全好物+独居技巧', tags: ['独居', '安全', '好物'], bestContent: '独居女生必买安全好物', takeaway: '痛点+好物=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('独居女孩安全指南') },
+  { name: '独居生活研究所', followers: '9.8w', niche: '独居生活', style: '独居+好物+技巧', tags: ['独居', '生活', '好物'], bestContent: '独居5年总结的生活技巧', takeaway: '经验+技巧=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('独居生活研究所') },
+  { name: '一个人住的好物', followers: '6.3w', niche: '独居好物', style: '独居+平价+好物', tags: ['独居', '好物', '平价'], bestContent: '一个人住提升幸福感的好物', takeaway: '独居+好物=高共鸣', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('一个人住的好物') },
+  { name: '效率App研究所', followers: '14.5w', niche: '效率工具', style: 'App推荐+教程', tags: ['效率', 'App', '教程'], bestContent: '我用了100个App后留下的10个', takeaway: '数量+筛选=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('效率App研究所') },
+  { name: '学习笔记研究所', followers: '8.9w', niche: '学习方法', style: '笔记技巧+学习好物', tags: ['学习', '笔记', '好物'], bestContent: '高效笔记法+学习好物推荐', takeaway: '技巧+好物=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('学习笔记研究所') },
+  { name: '考研倒计时日记', followers: '6.7w', niche: '考研学习', style: '考研+时间管理+好物', tags: ['考研', '学习', '时间管理'], bestContent: '考研党桌面好物清单', takeaway: '人群精准+好物=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('考研倒计时日记') },
+  { name: '手机修图研究所', followers: '16.3w', niche: '手机修图', style: '修图教程+参数分享', tags: ['修图', '教程', '参数'], bestContent: '手机修出电影感调色参数', takeaway: '参数+效果对比=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手机修图研究所') },
+  { name: '拍摄技巧研究所', followers: '12.6w', niche: '拍摄技巧', style: '拍摄+构图+技巧', tags: ['拍摄', '构图', '技巧'], bestContent: '手机拍出氛围感的5个技巧', takeaway: '技巧+对比=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('拍摄技巧研究所') },
+  { name: 'vlog拍摄日记', followers: '7.4w', niche: 'vlog拍摄', style: 'vlog+技巧+设备', tags: ['vlog', '拍摄', '设备'], bestContent: '一个人怎么拍vlog', takeaway: '教程+实操=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('vlog拍摄日记') },
+  { name: '调色参数分享', followers: '5.6w', niche: '调色教程', style: '调色+参数+预设', tags: ['调色', '参数', '预设'], bestContent: '7种风格调色参数大公开', takeaway: '合集+参数=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('调色参数分享') },
+  { name: '午后阳光日记', followers: '4.3w', niche: '午后氛围', style: '阳光+日常+好物', tags: ['氛围感', '日常', '好物'], bestContent: '午后的房间｜阳光+咖啡+书', takeaway: '氛围感+好物=高共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('午后阳光日记') },
+  { name: '一个人的早晨', followers: '5.5w', niche: '早安氛围', style: '晨光+日常+仪式感', tags: ['氛围感', '早安', '仪式感'], bestContent: '一个人的早晨仪式感', takeaway: '仪式感+氛围=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('一个人的早晨') },
+  { name: '深夜书桌', followers: '3.8w', niche: '深夜氛围', style: '深夜+书桌+灯光', tags: ['氛围感', '深夜', '书桌'], bestContent: '深夜书桌｜一个人的安静世界', takeaway: '深夜+书桌=共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('深夜书桌') },
+  { name: '下雨天好物', followers: '3.2w', niche: '雨天好物', style: '雨天+好物+氛围', tags: ['氛围感', '好物', '雨天'], bestContent: '下雨天适合买的好物', takeaway: '天气+好物=创意选题', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('下雨天好物') },
+  { name: '冬日暖物日记', followers: '4.6w', niche: '冬日好物', style: '冬日+暖+好物', tags: ['好物', '冬日', '暖'], bestContent: '冬日提升幸福感的暖物', takeaway: '季节+好物=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('冬日暖物日记') },
+  { name: '夏日清凉好物', followers: '5.1w', niche: '夏日好物', style: '夏日+清凉+好物', tags: ['好物', '夏日', '清凉'], bestContent: '夏日清凉好物推荐', takeaway: '季节+好物=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('夏日清凉好物') },
+  { name: '网购好物不踩雷', followers: '7.6w', niche: '网购好物', style: '网购+测评+避雷', tags: ['好物', '网购', '测评'], bestContent: '淘宝好物不踩雷清单', takeaway: '清单+避雷=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('网购好物不踩雷') },
+  { name: '便宜好用研究所', followers: '4.9w', niche: '便宜好物', style: '便宜+好用+测评', tags: ['平价', '好物', '测评'], bestContent: '便宜但好用的神仙好物', takeaway: '反差+好物=高互动', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('便宜好用研究所') },
+  { name: '好物试用日记', followers: '3.7w', niche: '好物试用', style: '长期使用+测评', tags: ['好物', '试用', '测评'], bestContent: '用了半年才敢推荐的好物', takeaway: '时间+真实=高信任', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('好物试用日记') },
+  { name: '买过最后悔的好物', followers: '6.1w', niche: '好物避雷', style: '避雷+吐槽+真实', tags: ['好物', '避雷', '吐槽'], bestContent: '买过最后悔的10件好物', takeaway: '吐槽+数字=高互动', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('买过最后悔的好物') },
+  { name: '被种草研究所', followers: '8.3w', niche: '种草好物', style: '种草+清单+真实', tags: ['好物', '种草', '清单'], bestContent: '被小红书种草的好物大赏', takeaway: '种草+平台=高共鸣', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('被种草研究所') },
+  { name: '手工DIY研究所', followers: '7.5w', niche: '手工DIY', style: 'DIY+教程+好物', tags: ['手工', 'DIY', '教程'], bestContent: '20元DIY改造收纳盒', takeaway: 'DIY+低成本=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('手工DIY研究所') },
+  { name: '生活美学研究所', followers: '9.2w', niche: '生活美学', style: '美学+好物+日常', tags: ['美学', '好物', '生活'], bestContent: '把日常生活过成美学', takeaway: '美学+日常=高共鸣', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('生活美学研究所') },
+  { name: '居家好物美学', followers: '6.8w', niche: '居家美学', style: '居家+美学+好物', tags: ['居家', '美学', '好物'], bestContent: '让家变美的10件小物', takeaway: '美学+好物=高收藏', type: '氛围感博主', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('居家好物美学') },
+  { name: '数码好物研究所', followers: '13.9w', niche: '数码好物', style: '数码+好物+测评', tags: ['数码', '好物', '测评'], bestContent: '2024年最值得买的数码好物', takeaway: '年度+好物=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('数码好物研究所') },
+  { name: '百元数码研究所', followers: '5.8w', niche: '百元数码', style: '百元+数码+好物', tags: ['数码', '百元', '好物'], bestContent: '100元以内数码好物合集', takeaway: '低价+合集=高互动', type: '素人爆款', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('百元数码研究所') },
+  { name: '数码避雷研究所', followers: '8.4w', niche: '数码避雷', style: '避雷+测评+真实', tags: ['数码', '避雷', '测评'], bestContent: '这些数码产品别再买了', takeaway: '避雷+反认知=高互动', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('数码避雷研究所') },
+  { name: '爆款拆解研究所', followers: '11.7w', niche: '爆款拆解', style: '爆款分析+方法论', tags: ['自媒体', '爆款', '分析'], bestContent: '拆解100篇爆款笔记的标题规律', takeaway: '拆解+规律=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('爆款拆解研究所') },
+  { name: '小红书涨粉日记', followers: '9.1w', niche: '涨粉记录', style: '涨粉+记录+方法', tags: ['自媒体', '涨粉', '记录'], bestContent: '从0到1万粉的60天记录', takeaway: '成长+记录=高共鸣', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('小红书涨粉日记') },
+  { name: '自媒体工具箱', followers: '7.6w', niche: '自媒体工具', style: '工具推荐+教程', tags: ['自媒体', '工具', '教程'], bestContent: '自媒体人必备的10个工具', takeaway: '工具+清单=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('自媒体工具箱') },
+  { name: '内容创作研究所', followers: '8.8w', niche: '内容创作', style: '创作方法+灵感', tags: ['自媒体', '创作', '灵感'], bestContent: '如何找到源源不断的选题灵感', takeaway: '方法+痛点=高收藏', type: '达人', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent('内容创作研究所') }
 ];
 
 // 每日爆款热搜榜 — 类似微博热搜
@@ -1888,9 +1987,28 @@ function renderInspirationPage(container) {
   // 爆款热搜榜（每日随机排序，取前8）
   const hotTopics = [...hotTopicsDB].sort(() => Math.random() - 0.5).slice(0, 8).map((t, i) => ({...t, rank: i+1}));
 
-  // 博主推荐（过滤掉不感兴趣的）
+  // 博主推荐（过滤掉不感兴趣的，支持分类筛选）
   if (!appData._bloggerPrefs) appData._bloggerPrefs = {};
-  const availableBloggers = bloggerAnalysisDB.filter(b => appData._bloggerPrefs[b.name] !== 'dislike');
+  if (!appData._bloggerCategory) appData._bloggerCategory = 'all';
+  // 按标签分类
+  const bloggerCategories = [
+    { key: 'all', label: '全部', icon: '🌟' },
+    { key: '好物', label: '好物种草', icon: '🛒' },
+    { key: '收纳', label: '收纳整理', icon: '📦' },
+    { key: '氛围感', label: '氛围感', icon: '🌙' },
+    { key: '自媒体', label: '自媒体', icon: '📹' },
+    { key: '文具', label: '文具手帐', icon: '✏️' },
+    { key: '数码', label: '数码开箱', icon: '📱' },
+    { key: '桌面', label: '桌面布置', icon: '🖥️' },
+    { key: '独居', label: '独居生活', icon: '🏠' },
+    { key: '美食', label: '美食', icon: '🍜' },
+    { key: '穿搭', label: '穿搭', icon: '👗' },
+    { key: '宠物', label: '宠物', icon: '🐱' },
+  ];
+  let availableBloggers = bloggerAnalysisDB.filter(b => appData._bloggerPrefs[b.name] !== 'dislike');
+  if (appData._bloggerCategory !== 'all') {
+    availableBloggers = availableBloggers.filter(b => b.tags && b.tags.includes(appData._bloggerCategory));
+  }
   const recommendBlogger = availableBloggers[Math.floor(Math.random() * availableBloggers.length)] || bloggerAnalysisDB[0];
 
   let html = `
@@ -1919,11 +2037,14 @@ function renderInspirationPage(container) {
     <!-- 今日博主推荐 -->
     <div class="card">
       <div class="card-header">
-        <div class="card-title"><span class="emoji">🎯</span>今日博主推荐</div>
+        <div class="card-title"><span class="emoji">🎯</span>今日博主推荐 <span style="font-size:11px;color:var(--text-muted);font-weight:400">（共${bloggerAnalysisDB.length}位）</span></div>
         <div style="display:flex;gap:6px;align-items:center">
           <span style="font-size:11px;color:var(--text-muted)">${recommendBlogger.type}</span>
           <button class="btn btn-secondary" id="refreshBloggerBtn" style="padding:4px 10px;font-size:12px">🔄 换一位</button>
         </div>
+      </div>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px">
+        ${bloggerCategories.map(c => `<div class="filter-chip ${appData._bloggerCategory===c.key?'active':''}" data-blogger-cat="${c.key}" style="font-size:11px;padding:3px 8px">${c.icon} ${c.label}</div>`).join('')}
       </div>
       <div style="background:linear-gradient(135deg,#f8e8ff,#ffe8f0);border-radius:var(--radius-md);padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
@@ -2124,6 +2245,15 @@ function renderInspirationPage(container) {
       saveData();
       renderPage('inspiration');
       showToast('🎯 已换一位博主！');
+    });
+
+    // 博主分类筛选
+    container.querySelectorAll('[data-blogger-cat]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        appData._bloggerCategory = chip.dataset.bloggerCat;
+        saveData();
+        renderPage('inspiration');
+      });
     });
 
     // 爆款刷新
