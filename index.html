@@ -4225,6 +4225,7 @@ function renderScriptsPage(container) {
   // 顶部操作栏
   html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
     <span style="font-size:12px;color:var(--text-muted);flex:1;min-width:100px">🎬 短视频脚本统筹 · 拍摄/剪辑/发布前置管理</span>
+    <button class="btn btn-secondary" id="smartParseBtn" style="padding:6px 14px;font-size:13px">🤖 智能识别</button>
     <button class="btn btn-primary" id="newScriptBtn" style="padding:6px 14px;font-size:13px">＋ 新建脚本</button>
   </div>`;
 
@@ -4293,6 +4294,11 @@ function renderScriptsPage(container) {
       showScriptModal(null);
     });
 
+    // 智能识别
+    document.getElementById('smartParseBtn')?.addEventListener('click', () => {
+      showSmartParseModal();
+    });
+
     // 脚本操作
     container.querySelectorAll('[data-action="editScript"]').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -4352,6 +4358,198 @@ function renderScriptsPage(container) {
       });
     });
   }, 0);
+}
+
+// 智能识别弹窗
+function showSmartParseModal() {
+  const modal = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">🤖 智能识别脚本文案</div>
+    <div style="font-size:12px;color:var(--text-muted);margin-bottom:10px;line-height:1.6">
+      📋 粘贴你的脚本文案、口播稿、或随手写的拍摄笔记，<br>
+      AI 自动识别并填充标题、产品、道具、镜头、文案、标签等字段
+    </div>
+    <div class="form-group">
+      <label class="form-label">粘贴文案 *</label>
+      <textarea class="form-input" id="parseInput" placeholder="把你的脚本文案粘贴到这里...&#10;&#10;支持识别：&#10;- 标题（#开头或【】包裹）&#10;- 产品/品牌名&#10;- 拍摄道具和场景&#10;- 镜头/运镜要求&#10;- 口播文案（「」或直接文字）&#10;- BGM/音乐风格&#10;- 标签（#xxx）" style="min-height:180px;resize:vertical;font-size:13px;line-height:1.6"></textarea>
+    </div>
+    <div id="parseResult" style="margin-top:8px"></div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary" id="doParseBtn" style="flex:1">🤖 开始识别</button>
+      <button class="btn btn-secondary" id="cancelParseBtn">取消</button>
+    </div>`;
+
+  modal.classList.add('active');
+
+  document.getElementById('cancelParseBtn').addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+
+  document.getElementById('doParseBtn').addEventListener('click', () => {
+    const text = document.getElementById('parseInput').value.trim();
+    if (!text || text.length < 5) { showToast('请粘贴文案内容'); return; }
+
+    const result = smartParseScript(text);
+
+    // 展示识别结果
+    const resultDiv = document.getElementById('parseResult');
+    resultDiv.innerHTML = `
+      <div style="background:var(--pink-50);border-radius:var(--radius-md);padding:12px;margin-top:8px">
+        <div style="font-size:12px;font-weight:700;color:var(--pink-500);margin-bottom:8px">✅ 识别完成！</div>
+        <div style="font-size:12px;line-height:1.8;color:var(--text-secondary)">
+          ${result.title ? `📌 标题：${escapeHtml(result.title)}<br>` : ''}
+          ${result.duration ? `⏱️ 时长：${escapeHtml(result.duration)}<br>` : ''}
+          ${result.products ? `📦 产品：${escapeHtml(result.products)}<br>` : ''}
+          ${result.props ? `🎭 道具布景：${escapeHtml(result.props)}<br>` : ''}
+          ${result.shots ? `🎥 镜头要求：${escapeHtml(result.shots)}<br>` : ''}
+          ${result.voiceover ? `🎙️ 口播文案：${escapeHtml(result.voiceover.substring(0,80))}...<br>` : ''}
+          ${result.bgm ? `🎵 BGM：${escapeHtml(result.bgm)}<br>` : ''}
+          ${result.transition ? `🎞️ 转场：${escapeHtml(result.transition)}<br>` : ''}
+          ${result.subtitle ? `📝 字幕：${escapeHtml(result.subtitle)}<br>` : ''}
+          ${result.tags && result.tags.length ? `🏷️ 标签：${result.tags.map(t=>'#'+t).join(' ')}<br>` : ''}
+        </div>
+        <div style="font-size:11px;color:var(--text-muted);margin-top:6px">可在下一步编辑修改识别结果</div>
+      </div>`;
+
+    // 替换按钮为"创建脚本"
+    const btnContainer = document.getElementById('doParseBtn').parentElement;
+    btnContainer.innerHTML = `
+      <button class="btn btn-primary" id="confirmParseBtn" style="flex:1">✏️ 去编辑完善</button>
+      <button class="btn btn-secondary" id="reparseBtn">🔄 重新识别</button>
+      <button class="btn btn-secondary" id="cancelParse2Btn">取消</button>`;
+
+    document.getElementById('cancelParse2Btn').addEventListener('click', () => {
+      modal.classList.remove('active');
+    });
+    document.getElementById('reparseBtn').addEventListener('click', () => {
+      showSmartParseModal();
+      // 恢复原文案
+      document.getElementById('parseInput').value = text;
+    });
+    document.getElementById('confirmParseBtn').addEventListener('click', () => {
+      modal.classList.remove('active');
+      showScriptModal(result); // 用识别结果预填脚本编辑弹窗
+    });
+  });
+}
+
+// 智能解析脚本文案
+function smartParseScript(text) {
+  const lines = text.split(/\n/).map(l => l.trim()).filter(Boolean);
+  const result = {
+    id: '', title: '', coverIdea: '', duration: '', status: 'draft',
+    products: '', props: '', shots: '', voiceover: '',
+    bgm: '', transition: '', subtitle: '', tags: []
+  };
+
+  // ========== 1. 提取标签 #xxx ==========
+  const tagMatches = text.match(/[#＃]([^\s#＃，,。.!！、]{1,15})/g) || [];
+  result.tags = [...new Set(tagMatches.map(t => t.replace(/^[#＃]/, '').trim()))].slice(0, 10);
+
+  // ========== 2. 提取标题 ==========
+  // 匹配：【标题】或 #标题（行首单独的#不算标签）
+  for (const line of lines.slice(0, 5)) {
+    const bracketMatch = line.match(/^[【\[《](.+?)[】\]》]$/);
+    if (bracketMatch) { result.title = bracketMatch[1].trim(); break; }
+    const hashTitle = line.match(/^#{1,3}\s*(.+)/);
+    if (hashTitle && hashTitle[1].length > 3 && !hashTitle[1].includes('：')) {
+      result.title = hashTitle[1].trim(); break;
+    }
+    // 第一行短文本作为标题
+    if (line.length <= 30 && !line.includes('。') && !line.includes('！') && lines.indexOf(line) === 0) {
+      result.title = line.replace(/[#＃]/g, '').trim();
+    }
+  }
+  // 如果标题没匹配到，取第一行前20字
+  if (!result.title) {
+    result.title = lines[0].substring(0, 20).replace(/[#＃【】\[\]]/g, '').trim() || '未命名脚本';
+  }
+
+  // ========== 3. 提取时长 ==========
+  const durationMatch = text.match(/(\d+[\.\d]*)\s*(秒|s|S|分|min|分钟)/);
+  if (durationMatch) {
+    const num = parseFloat(durationMatch[1]);
+    const unit = durationMatch[2];
+    if (unit.includes('秒') || unit.toLowerCase() === 's') {
+      result.duration = num >= 60 ? `${(num/60).toFixed(1)}min` : `${num}s`;
+    } else {
+      result.duration = `${num}min`;
+    }
+  }
+  // 也匹配 "时长：60s" 这种
+  const durationLabel = text.match(/时长[：:]\s*(\S+)/);
+  if (durationLabel) result.duration = durationLabel[1];
+
+  // ========== 4. 按关键词分类提取各字段 ==========
+  const keywords = {
+    products: ['产品', '品牌', '商品', '好物', '种草', '推荐好物', '用到', '需要准备', '清单'],
+    props: ['道具', '布景', '场景', '背景', '场地', '布置', '器材', '设备'],
+    shots: ['镜头', '运镜', '景别', '特写', '全景', '近景', '远景', '推镜头', '拉镜头', '跟拍', '航拍', '机位', '分镜', '画面'],
+    voiceover: ['口播', '文案', '旁白', '解说', '台词', '配音', '说', '讲'],
+    bgm: ['BGM', 'bgm', '音乐', '背景音乐', '配乐', 'Bgm'],
+    transition: ['转场', '过渡', '衔接'],
+    subtitle: ['字幕', '花字', '文字', '标题字']
+  };
+
+  const collected = { products: [], props: [], shots: [], voiceover: [], bgm: [], transition: [], subtitle: [] };
+
+  lines.forEach(line => {
+    // 检查是否是"标签：内容"格式
+    const labelMatch = line.match(/^(.+?)[：:]\s*(.+)/);
+    if (labelMatch) {
+      const label = labelMatch[1].trim();
+      const value = labelMatch[2].trim();
+      for (const [field, kws] of Object.entries(keywords)) {
+        if (kws.some(kw => label.includes(kw))) {
+          collected[field].push(value);
+          return;
+        }
+      }
+    }
+
+    // 检查行内关键词
+    for (const [field, kws] of Object.entries(keywords)) {
+      if (collected[field].length === 0 && kws.some(kw => line.includes(kw))) {
+        // 对于口播文案，收集更多内容
+        if (field === 'voiceover') {
+          collected[field].push(line);
+        } else if (field !== 'bgm' || line.length < 30) {
+          collected[field].push(line.replace(new RegExp(kws.find(kw=>line.includes(kw))), '').trim());
+        }
+      }
+    }
+  });
+
+  // ========== 5. 口播文案特殊处理 ==========
+  // 如果有「」包裹的内容，优先作为口播文案
+  const quoteMatches = text.match(/[「「"](.+?)[」」"]/g);
+  if (quoteMatches && quoteMatches.length > 0) {
+    result.voiceover = quoteMatches.map(q => q.replace(/^[「「"]/, '').replace(/[」」"]$/, '')).join('\n');
+  } else if (collected.voiceover.length > 0) {
+    result.voiceover = collected.voiceover.join('\n');
+  } else {
+    // 如果没有明确标记，把最长的几段文字作为口播文案
+    const longLines = lines.filter(l => l.length > 15 && !l.match(/^[#\d【】\[\]]/) && !result.tags.some(t => l.includes(t)));
+    if (longLines.length > 0) {
+      result.voiceover = longLines.slice(0, 10).join('\n');
+    }
+  }
+
+  // ========== 6. 填充其他字段 ==========
+  result.products = collected.products.join('\n').trim();
+  result.props = collected.props.join('\n').trim();
+  result.shots = collected.shots.join('\n').trim();
+  result.bgm = collected.bgm.join(' ').trim();
+  result.transition = collected.transition.join(' ').trim();
+  result.subtitle = collected.subtitle.join(' ').trim();
+
+  // ========== 7. 封面构思 ==========
+  const coverMatch = text.match(/(?:封面|首图|封面图)[：:]\s*(.+)/);
+  if (coverMatch) result.coverIdea = coverMatch[1].trim();
+
+  return result;
 }
 
 function showScriptModal(script) {
