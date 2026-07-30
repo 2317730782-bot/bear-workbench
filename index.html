@@ -1143,10 +1143,10 @@ const defaultData = {
     news: { visible: true },
     expression: { visible: true },
     aiVideos: { visible: true },
-    podcasts: { visible: true },
-    morningNews: { visible: true }
+    podcasts: { visible: true }
   },
   topics: { savedTopics: [] },
+  scripts: [],
   english: { learnedDates: [], favorites: [] },
   posture: { checkins: [], records: [], favorites: [], reminder: { enabled: false, time: '14:00' } },
   settings: {
@@ -1213,6 +1213,7 @@ const modules = [
   { id: 'posture', name: '体态管理', icon: '🧘', emoji: '💪', group: '🌱 个人提升' },
   { id: 'topics', name: '选题库', icon: '🎯', emoji: '🔖', group: '💼 工作' },
   { id: 'inspiration', name: '热点拆分', icon: '💡', emoji: '✨', group: '💼 工作' },
+  { id: 'scripts', name: '脚本管理', icon: '🎬', emoji: '🎞️', group: '💼 工作' },
   { id: 'settings', name: '设置', icon: '⚙️', emoji: '🔧', group: '' }
 ];
 
@@ -1278,6 +1279,7 @@ function renderPage(page) {
     case 'inspiration': renderInspirationPage(container); break;
     case 'learning': renderLearningPage(container); break;
     case 'posture': renderPosturePage(container); break;
+    case 'scripts': renderScriptsPage(container); break;
     case 'horoscope': renderHoroscopePage(container); break;
     case 'memorial': renderMemorialPage(container); break;
     case 'period': renderPeriodPage(container); break;
@@ -1904,12 +1906,13 @@ function renderInspirationPage(container) {
     const rankColor = t.rank <= 3 ? 'var(--pink-500)' : 'var(--text-muted)';
     const tagColor = t.tag.includes('爆') ? '#ff5a5f' : t.tag.includes('升') ? '#ff9500' : '#8cb4f0';
     html += `
-      <a href="${t.url}" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border-soft);text-decoration:none;color:inherit">
+      <div style="display:flex;align-items:center;gap:10px;padding:8px 4px;border-bottom:1px solid var(--border-soft)">
         <span style="font-size:16px;font-weight:800;color:${rankColor};width:24px;text-align:center">${t.rank}</span>
-        <span style="flex:1;font-size:13px;font-weight:500">${escapeHtml(t.title)}</span>
+        <a href="${fixXhsUrl(t.url)}" target="_blank" rel="noopener" style="flex:1;font-size:13px;font-weight:500;color:var(--text-primary);text-decoration:none">${escapeHtml(t.title)}</a>
         <span style="font-size:10px;padding:2px 6px;border-radius:8px;background:${tagColor};color:white;font-weight:600">${t.tag}</span>
-        <span style="font-size:11px;color:var(--text-muted)">${t.heat}</span>
-      </a>`;
+        <span style="font-size:11px;color:var(--text-muted);min-width:40px">${t.heat}</span>
+        <button class="inbox-action" data-action="copyTopic" data-title="${escapeHtml(t.title)}" style="font-size:11px;padding:4px 8px">📋</button>
+      </div>`;
   });
   html += `</div>
 
@@ -1917,7 +1920,10 @@ function renderInspirationPage(container) {
     <div class="card">
       <div class="card-header">
         <div class="card-title"><span class="emoji">🎯</span>今日博主推荐</div>
-        <span style="font-size:11px;color:var(--text-muted)">${recommendBlogger.type}</span>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span style="font-size:11px;color:var(--text-muted)">${recommendBlogger.type}</span>
+          <button class="btn btn-secondary" id="refreshBloggerBtn" style="padding:4px 10px;font-size:12px">🔄 换一位</button>
+        </div>
       </div>
       <div style="background:linear-gradient(135deg,#f8e8ff,#ffe8f0);border-radius:var(--radius-md);padding:14px">
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
@@ -1933,7 +1939,7 @@ function renderInspirationPage(container) {
           💡 借鉴：${recommendBlogger.takeaway}
         </div>
         <div style="display:flex;gap:8px;flex-wrap:wrap">
-          <a href="${recommendBlogger.profileUrl}" target="_blank" rel="noopener" class="inbox-action primary" style="text-decoration:none">🔗 访问主页</a>
+          <a href="${fixXhsUrl(recommendBlogger.profileUrl)}" target="_blank" rel="noopener" class="inbox-action primary" style="text-decoration:none">🔗 访问主页</a>
           <button class="inbox-action" data-action="likeBlogger" data-name="${escapeHtml(recommendBlogger.name)}">💗 感兴趣</button>
           <button class="inbox-action" data-action="dislikeBlogger" data-name="${escapeHtml(recommendBlogger.name)}">🙅 不感兴趣</button>
           <button class="inbox-action" data-action="analyzeBloggerDeep" data-name="${escapeHtml(recommendBlogger.name)}">🔍 深度分析</button>
@@ -2107,15 +2113,31 @@ function renderInspirationPage(container) {
     });
     container.querySelectorAll('[data-action="analyzeBloggerDeep"]').forEach(btn => {
       btn.addEventListener('click', () => {
-        document.getElementById('workBloggerName').value = btn.dataset.name;
-        analyzeWork(btn.dataset.name, '', '视频');
+        // 用弹窗展示深度分析结果
+        analyzeBloggerInModal(btn.dataset.name);
       });
+    });
+
+    // 刷新博主推荐
+    document.getElementById('refreshBloggerBtn')?.addEventListener('click', () => {
+      appData._bloggerRefreshSeed = (appData._bloggerRefreshSeed || 0) + 1;
+      saveData();
+      renderPage('inspiration');
+      showToast('🎯 已换一位博主！');
     });
 
     // 爆款刷新
     document.getElementById('refreshHotBtn')?.addEventListener('click', () => {
       renderPage('inspiration');
       showToast('🔥 热搜已更新！');
+    });
+
+    // 复制热搜标题
+    container.querySelectorAll('[data-action="copyTopic"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        copyText(btn.dataset.title);
+        showToast('📋 已复制标题！');
+      });
     });
 
     // 作品分析
@@ -2268,7 +2290,7 @@ ${pickedHot.map((h,i) => `${i+1}.「${h.title}」\n   📅 ${h.time}发布 · �
     resultDiv.innerHTML = `
       <div class="inspo-breakdown" style="margin-top:0;max-height:none">${breakdown.replace(/\n/g, '<br>')}</div>
       <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-        <a href="${profileUrl}" target="_blank" rel="noopener" class="inbox-action primary" style="text-decoration:none">🔗 博主主页</a>
+        <a href="${fixXhsUrl(profileUrl)}" target="_blank" rel="noopener" class="inbox-action primary" style="text-decoration:none">🔗 博主主页</a>
         ${workUrl ? `<a href="${workUrl}" target="_blank" rel="noopener" class="inbox-action" style="text-decoration:none">🔗 查看原作品</a>` : ''}
         <button class="inbox-action" id="saveWorkAnalysis">📥 存入灵感库</button>
       </div>`;
@@ -2289,6 +2311,96 @@ ${pickedHot.map((h,i) => `${i+1}.「${h.title}」\n   📅 ${h.time}发布 · �
       showToast('✨ 账号分析已存入灵感库！');
     });
   }
+}
+
+// 弹窗展示博主深度分析
+function analyzeBloggerInModal(bloggerName) {
+  const found = bloggerAnalysisDB.find(b => b.name.includes(bloggerName) || bloggerName.includes(b.name));
+  const blogger = found || { name: bloggerName, niche: '综合内容', style: '个人风格鲜明', type: '素人博主', followers: (Math.floor(Math.random()*15)+1)+'w', profileUrl: 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent(bloggerName) };
+
+  // 模拟账号运营数据
+  const updateFreq = ['2天更1次', '3天更1次', '一周更2次', '日更', '一周更1次'][Math.floor(Math.random()*5)];
+  const totalPosts = Math.floor(Math.random() * 12) + 8;
+  const hotPosts = Math.floor(Math.random() * 3) + 1;
+  const avgLikes = Math.floor(Math.random() * 8000) + 2000;
+  const avgCollects = Math.floor(Math.random() * 3000) + 500;
+  const avgComments = Math.floor(Math.random() * 300) + 50;
+  const bestPostTime = ['20:00', '21:30', '12:00', '18:30', '22:00', '07:30'][Math.floor(Math.random()*6)];
+  const bestPostDay = ['周三', '周四', '周六', '周日', '周五'][Math.floor(Math.random()*5)];
+
+  const hotTitles = [
+    { title: '百元好物分享｜提升幸福感的小东西', likes: Math.floor(Math.random()*5000)+8000, time: bestPostTime, ratio: '1:3.2' },
+    { title: '真实测评｜用了30天才敢推荐', likes: Math.floor(Math.random()*4000)+6000, time: '21:00', ratio: '1:2.8' },
+    { title: '桌面改造全过程｜附清单', likes: Math.floor(Math.random()*3000)+5000, time: '20:30', ratio: '1:4.1' }
+  ];
+  const pickedHot = hotTitles.slice(0, hotPosts);
+
+  const profileUrl = blogger.profileUrl || 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent(bloggerName);
+  // 小红书作品搜索链接
+  const workSearchUrl = 'https://www.xiaohongshu.com/search_result?keyword=' + encodeURIComponent(bloggerName + ' 爆款');
+
+  const breakdown = `📊 账号运营分析：@${bloggerName}
+👥 粉丝量：${blogger.followers || '未知'} · 博主类型：${blogger.type || '达人'}
+🎯 垂直领域：${blogger.niche}
+
+📅 【近30天更新规律】
+• 更新频率：${updateFreq}
+• 发布总数：${totalPosts} 篇
+• 爆款数量：${hotPosts} 篇（互动超均值3倍）
+• 最佳发布时间：${bestPostDay} ${bestPostTime}
+• 平均互动：👍${avgLikes} 📌${avgCollects} 💬${avgComments}
+• 点赞收藏比：约1:${(avgCollects/avgLikes).toFixed(1)}
+
+🔥 【爆款作品TOP${hotPosts}】
+${pickedHot.map((h,i) => `${i+1}.「${h.title}」\n   📅 ${h.time}发布 · 👍${h.likes} · 点收比${h.ratio}`).join('\n')}
+
+💡 【综合学习建议】
+这位博主更新节奏${updateFreq}，爆款集中在${bestPostDay}${bestPostTime}发布。
+粉丝量${blogger.followers || '未知'}，属于${blogger.type || '达人'}类型。
+建议学习其${blogger.style}的内容风格，关注${blogger.niche}赛道的表达方式。`;
+
+  const modal = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">🔍 博主深度分析</div>
+    <div style="background:linear-gradient(135deg,#f8e8ff,#ffe8f0);border-radius:var(--radius-md);padding:14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+        <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--pink-300),var(--accent-purple));display:flex;align-items:center;justify-content:center;font-size:18px">🐻</div>
+        <div>
+          <div style="font-weight:700;font-size:14px">@${escapeHtml(bloggerName)}</div>
+          <div style="font-size:11px;color:var(--text-muted)">${blogger.followers || '未知'}粉丝 · ${blogger.niche} · ${blogger.type || '达人'}</div>
+        </div>
+      </div>
+    </div>
+    <div class="inspo-breakdown" style="margin-top:0;max-height:50vh;overflow-y:auto;font-size:12px;line-height:1.8">${breakdown.replace(/\n/g, '<br>')}</div>
+    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+      <a href="${fixXhsUrl(profileUrl)}" target="_blank" rel="noopener" class="inbox-action primary" style="text-decoration:none">🔗 博主主页</a>
+      <a href="${fixXhsUrl(workSearchUrl)}" target="_blank" rel="noopener" class="inbox-action" style="text-decoration:none">🎬 查看作品</a>
+      <button class="inbox-action" id="modalSaveAnalysis">📥 存入灵感库</button>
+      <button class="inbox-action" id="modalCloseAnalysis">✖️ 关闭</button>
+    </div>`;
+
+  modal.classList.add('active');
+
+  document.getElementById('modalCloseAnalysis').addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+  document.getElementById('modalSaveAnalysis').addEventListener('click', () => {
+    const todayCount = appData.inspirations.filter(i => isToday(i.createdAt)).length;
+    if (todayCount >= 8) { showToast('今日已达上限（8条）'); return; }
+    appData.inspirations.push({
+      id: Date.now().toString(),
+      title: `账号分析：@${bloggerName}（${updateFreq}·${hotPosts}爆款）`,
+      breakdown: breakdown,
+      platform: '作品分析',
+      workUrl: profileUrl,
+      createdAt: Date.now()
+    });
+    saveData();
+    showToast('✨ 已存入灵感库！');
+    modal.classList.remove('active');
+  });
 }
 
 // 脚本分镜生成
@@ -3616,7 +3728,48 @@ const hotSearchWords = [
   { word: '一人食快手晚餐', cat: '美食', heat: '📈 17w' },
   { word: '桌面收纳神器推荐', cat: '桌面', heat: '🔥 15w' },
   { word: '手机摄影构图技巧', cat: '摄影', heat: '📊 13w' },
-  { word: '记账APP真实对比', cat: '效率', heat: '📈 11w' }
+  { word: '记账APP真实对比', cat: '效率', heat: '📈 11w' },
+  { word: '卧室氛围感灯光改造', cat: '家居', heat: '🔥 95w' },
+  { word: '租房不动墙改造方案', cat: '家居', heat: '📈 89w' },
+  { word: '极简桌面线材收纳', cat: '桌面', heat: '📊 81w' },
+  { word: '平价手帐排版灵感', cat: '效率', heat: '🔥 77w' },
+  { word: '独居女生健身计划', cat: '生活', heat: '📈 72w' },
+  { word: '猫咪主食罐头测评', cat: '宠物', heat: '📊 68w' },
+  { word: '空气炸锅懒人食谱', cat: '美食', heat: '🔥 64w' },
+  { word: '秋冬护肤不踩雷', cat: '美妆', heat: '📈 61w' },
+  { word: '学生党平价穿搭', cat: '穿搭', heat: '📊 57w' },
+  { word: 'iPhone隐藏功能合集', cat: '数码', heat: '🔥 55w' },
+  { word: '小户型收纳柜推荐', cat: '家居', heat: '📈 51w' },
+  { word: '减脂期外食怎么吃', cat: '美食', heat: '📊 47w' },
+  { word: '日落氛围感调色教程', cat: '摄影', heat: '🔥 45w' },
+  { word: '桌面绿植养护指南', cat: '桌面', heat: '📈 42w' },
+  { word: '无印良品平替清单', cat: '好物', heat: '📊 38w' },
+  { word: '一周备餐减脂便当', cat: '美食', heat: '🔥 36w' },
+  { word: 'kindle还能用来做什么', cat: '数码', heat: '📈 33w' },
+  { word: '小个子显高穿搭公式', cat: '穿搭', heat: '📊 30w' },
+  { word: '养狗必看驱虫指南', cat: '宠物', heat: '🔥 27w' },
+  { word: '自制饮品夏日特调', cat: '美食', heat: '📈 25w' },
+  { word: '桌面洞洞板收纳方案', cat: '桌面', heat: '📊 23w' },
+  { word: '女生租房安全自查', cat: '生活', heat: '🔥 21w' },
+  { word: '手机拍出电影感画面', cat: '摄影', heat: '📈 18w' },
+  { word: '极简衣橱整理法', cat: '穿搭', heat: '📊 16w' },
+  { word: '百元以内数码好物', cat: '数码', heat: '🔥 14w' },
+  { word: '独居女生晚餐灵感', cat: '美食', heat: '📈 12w' },
+  { word: '桌面显示器支架推荐', cat: '桌面', heat: '📊 10w' },
+  { word: '通勤包里装什么', cat: '好物', heat: '🔥 9w' },
+  { word: '考研政治冲刺时间表', cat: '学习', heat: '📈 8w' },
+  { word: '出租屋厨房收纳神器', cat: '家居', heat: '📊 7w' },
+  { word: '早安打卡vlog模板', cat: '生活', heat: '🔥 6w' },
+  { word: '手账工具入门推荐', cat: '效率', heat: '📈 5w' },
+  { word: '夏日防晒不踩雷', cat: '美妆', heat: '📊 4w' },
+  { word: '桌面香薰氛围感好物', cat: '桌面', heat: '🔥 3w' },
+  { word: '一人食锅具推荐', cat: '好物', heat: '📈 2w' },
+  { word: '宠物自动喂食器对比', cat: '宠物', heat: '📊 2w' },
+  { word: 'iPhone拍照快捷键', cat: '数码', heat: '🔥 1w' },
+  { word: '租房窗帘免打孔安装', cat: '家居', heat: '📈 1w' },
+  { word: '极简护肤步骤分享', cat: '美妆', heat: '📊 1w' },
+  { word: '每日穿搭记录app', cat: '效率', heat: '🔥 1w' },
+  { word: '微单入门选购指南', cat: '摄影', heat: '📈 1w' }
 ];
 
 function renderTopicsPage(container) {
@@ -3632,7 +3785,7 @@ function renderTopicsPage(container) {
         <div class="card-title"><span class="emoji">🎯</span>今日热点搜索词</div>
         <button class="btn btn-secondary" id="refreshTopicsBtn" style="padding:4px 10px;font-size:12px">🔄 换一批</button>
       </div>
-      <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">📊 每日更新 · 点击跳转小红书搜索 · 长按可存入收件箱</div>`;
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:12px">📊 每日更新 · 点击跳转小红书搜索 · 📥收藏同时存入收件箱</div>`;
 
   todayTopics.forEach((t, i) => {
     const rankColor = i < 3 ? 'var(--pink-500)' : 'var(--text-muted)';
@@ -3687,8 +3840,16 @@ function renderTopicsPage(container) {
         const cat = btn.dataset.cat;
         if (!appData.topics.savedTopics.find(t => t.word === word)) {
           appData.topics.savedTopics.push({ word, cat, savedAt: Date.now() });
+          // 同时推送到收件箱
+          appData.inbox.push({
+            id: Date.now().toString(),
+            text: `🔖 [选题] ${word}（${cat}）`,
+            source: 'idea',
+            icon: '🔖',
+            time: Date.now()
+          });
           saveData();
-          showToast('📥 已存入选题收藏');
+          showToast('📥 已存入选题收藏 + 收件箱');
         } else {
           showToast('已经收藏过了～');
         }
@@ -3872,8 +4033,7 @@ function renderReadingPage(container) {
       news: getRandomReadingItems('news', 4),
       expression: getRandomReadingItems('expression', 3),
       aiVideos: getRandomReadingItems('aiVideos', 2),
-      podcasts: getRandomReadingItems('podcasts', 2),
-      morningNews: getRandomReadingItems('morningNews', 2)
+      podcasts: getRandomReadingItems('podcasts', 2)
     };
   }
   if (!appData._readingExpanded) appData._readingExpanded = 'expression';
@@ -3897,12 +4057,6 @@ function renderReadingPage(container) {
           <button class="reading-toggle" data-action="copy" data-text="${escapeHtml(t.text)}" style="font-size:11px;padding:3px 10px">📋 复制</button>
           <button class="reading-toggle" data-action="collectExpr" data-text="${escapeHtml(t.text)}" style="font-size:11px;padding:3px 10px">📥 收藏</button>
         </div>
-      </div>` },
-    { key: 'morningNews', title: '早间新闻精选', icon: '🌅', items: ri.morningNews, render: (t) => `
-      <div class="reading-card">
-        <h4 style="font-size:13px;margin-bottom:4px">${escapeHtml(t.title)}</h4>
-        <p style="font-size:12px;line-height:1.5">${escapeHtml(t.summary)}</p>
-        <a href="${t.url}" target="_blank" rel="noopener" style="display:inline-block;margin-top:6px;font-size:12px;color:var(--pink-500);text-decoration:none;background:var(--pink-50);padding:4px 10px;border-radius:12px">📖 阅读全文 →</a>
       </div>` },
     { key: 'news', title: '每日新闻（国内外）', icon: '📰', items: ri.news, render: (t) => `
       <div class="reading-card">
@@ -4006,7 +4160,7 @@ function renderReadingPage(container) {
         const section = btn.dataset.section;
         const action = btn.dataset.action;
         if (action === 'refresh' && section) {
-          const counts = { news: 4, expression: 3, books: 3, finance: 2, aiVideos: 2, podcasts: 2, morningNews: 2 };
+          const counts = { news: 4, expression: 3, books: 3, finance: 2, aiVideos: 2, podcasts: 2 };
           appData._readingItems[section] = getRandomReadingItems(section, counts[section] || 2);
           appData._readingExpanded = section;
           saveData();
@@ -4042,8 +4196,7 @@ function renderReadingPage(container) {
         news: getRandomReadingItems('news', 4),
         expression: getRandomReadingItems('expression', 3),
         aiVideos: getRandomReadingItems('aiVideos', 2),
-        podcasts: getRandomReadingItems('podcasts', 2),
-        morningNews: getRandomReadingItems('morningNews', 2)
+        podcasts: getRandomReadingItems('podcasts', 2)
       };
       saveData();
       renderPage('reading');
@@ -4051,7 +4204,7 @@ function renderReadingPage(container) {
     });
 
     document.getElementById('restoreReadingSections')?.addEventListener('click', () => {
-      ['expression', 'morningNews', 'news', 'books', 'aiVideos', 'podcasts', 'finance'].forEach(k => {
+      ['expression', 'news', 'books', 'aiVideos', 'podcasts', 'finance'].forEach(k => {
         if (appData.reading[k]) appData.reading[k].visible = true;
       });
       saveData();
@@ -4059,6 +4212,313 @@ function renderReadingPage(container) {
       showToast('✅ 已恢复所有隐藏栏目');
     });
   }, 0);
+}
+
+// ========== SCRIPTS (脚本管理) ==========
+function renderScriptsPage(container) {
+  const scripts = appData.scripts || [];
+  const statusFilter = appData._scriptFilter || 'all';
+  const filtered = statusFilter === 'all' ? scripts : scripts.filter(s => s.status === statusFilter);
+
+  let html = '';
+
+  // 顶部操作栏
+  html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap">
+    <span style="font-size:12px;color:var(--text-muted);flex:1;min-width:100px">🎬 短视频脚本统筹 · 拍摄/剪辑/发布前置管理</span>
+    <button class="btn btn-primary" id="newScriptBtn" style="padding:6px 14px;font-size:13px">＋ 新建脚本</button>
+  </div>`;
+
+  // 状态筛选
+  const statuses = [
+    { key: 'all', label: '全部', icon: '📋' },
+    { key: 'draft', label: '草稿', icon: '📝' },
+    { key: 'ready', label: '待拍', icon: '🎥' },
+    { key: 'filming', label: '拍摄中', icon: '🎬' },
+    { key: 'editing', label: '剪辑中', icon: '✂️' },
+    { key: 'done', label: '已发布', icon: '✅' }
+  ];
+  html += `<div class="inbox-filters">`;
+  statuses.forEach(s => {
+    html += `<div class="filter-chip ${statusFilter===s.key?'active':''}" data-script-filter="${s.key}">${s.icon} ${s.label}${s.key!=='all'?'('+scripts.filter(sc=>sc.status===s.key).length+')':''}</div>`;
+  });
+  html += `</div>`;
+
+  // 脚本列表
+  if (filtered.length === 0) {
+    html += `<div class="empty-state">
+      <div class="empty-state-icon">🎬</div>
+      <div class="empty-state-text">${scripts.length === 0 ? '还没有脚本～<br>点击「新建脚本」开始筹备你的短视频' : '该状态下暂无脚本'}</div>
+    </div>`;
+  } else {
+    filtered.forEach(s => {
+      const statusMap = { draft: '📝 草稿', ready: '🎥 待拍', filming: '🎬 拍摄中', editing: '✂️ 剪辑中', done: '✅ 已发布' };
+      const statusColor = { draft: '#999', ready: '#ff9500', filming: '#ff5a5f', editing: '#8b5cf6', done: '#5a9e6f' };
+      html += `
+        <div class="card" style="margin-bottom:12px">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:8px">
+            <div style="flex:1;min-width:0">
+              <div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:4px">
+                <span class="tag" style="font-size:10px;padding:2px 8px;background:${statusColor[s.status]||'#999'};color:white">${statusMap[s.status]||s.status}</span>
+                ${s.duration ? `<span style="font-size:11px;color:var(--text-muted)">⏱️ ${escapeHtml(s.duration)}</span>` : ''}
+              </div>
+              <h4 style="font-size:14px;font-weight:700;margin-bottom:4px">${escapeHtml(s.title || '未命名脚本')}</h4>
+              ${s.coverIdea ? `<div style="font-size:12px;color:var(--text-muted);margin-bottom:4px">📸 ${escapeHtml(s.coverIdea)}</div>` : ''}
+            </div>
+          </div>
+          ${s.tags && s.tags.length ? `<div style="display:flex;gap:4px;flex-wrap:wrap;margin:6px 0">${s.tags.map(t=>`<span class="tag" style="font-size:9px;padding:1px 6px">#${escapeHtml(t)}</span>`).join('')}</div>` : ''}
+          <div style="display:flex;gap:6px;margin-top:8px;flex-wrap:wrap">
+            <button class="inbox-action primary" data-action="editScript" data-id="${s.id}">✏️ 编辑</button>
+            <button class="inbox-action" data-action="exportScript" data-id="${s.id}">📋 导出文案</button>
+            <button class="inbox-action" data-action="scriptToInbox" data-id="${s.id}">📥 推收件箱</button>
+            <button class="inbox-action" data-action="scriptToKanban" data-id="${s.id}">📌 推看板</button>
+            <button class="inbox-action" data-action="delScript" data-id="${s.id}" style="color:#ff5a5f">🗑️</button>
+          </div>
+        </div>`;
+    });
+  }
+
+  container.innerHTML = html;
+
+  setTimeout(() => {
+    // 状态筛选
+    container.querySelectorAll('[data-script-filter]').forEach(chip => {
+      chip.addEventListener('click', () => {
+        appData._scriptFilter = chip.dataset.scriptFilter;
+        renderPage('scripts');
+      });
+    });
+
+    // 新建脚本
+    document.getElementById('newScriptBtn')?.addEventListener('click', () => {
+      showScriptModal(null);
+    });
+
+    // 脚本操作
+    container.querySelectorAll('[data-action="editScript"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = scripts.find(sc => sc.id === btn.dataset.id);
+        if (s) showScriptModal(s);
+      });
+    });
+
+    container.querySelectorAll('[data-action="exportScript"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = scripts.find(sc => sc.id === btn.dataset.id);
+        if (s) exportScriptText(s);
+      });
+    });
+
+    container.querySelectorAll('[data-action="scriptToInbox"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = scripts.find(sc => sc.id === btn.dataset.id);
+        if (!s) return;
+        appData.inbox.push({
+          id: Date.now().toString(),
+          text: `🎬 [脚本] ${s.title}${s.status==='ready'?' - 待拍摄':''}${s.status==='editing'?' - 待剪辑':''}`,
+          source: 'idea',
+          icon: '🎬',
+          time: Date.now()
+        });
+        saveData();
+        showToast('📥 已推送至收件箱');
+      });
+    });
+
+    container.querySelectorAll('[data-action="scriptToKanban"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const s = scripts.find(sc => sc.id === btn.dataset.id);
+        if (!s) return;
+        const statusMap = { draft: '待做', ready: '待做', filming: '进行中', editing: '进行中', done: '已完成' };
+        const col = statusMap[s.status] || '待做';
+        appData.kanban[col.toLowerCase().includes('待') ? 'todo' : col.toLowerCase().includes('进行') ? 'doing' : 'done'].push({
+          id: Date.now().toString(),
+          title: `🎬 ${s.title}`,
+          tags: s.tags || [],
+          note: s.coverIdea || '',
+          deadline: '',
+          createdAt: Date.now()
+        });
+        saveData();
+        showToast(`📌 已推送至看板 - ${col}`);
+      });
+    });
+
+    container.querySelectorAll('[data-action="delScript"]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        appData.scripts = scripts.filter(sc => sc.id !== btn.dataset.id);
+        saveData();
+        renderPage('scripts');
+        showToast('已删除');
+      });
+    });
+  }, 0);
+}
+
+function showScriptModal(script) {
+  const isNew = !script;
+  const s = script || {
+    id: '', title: '', coverIdea: '', duration: '', status: 'draft',
+    products: '', props: '', shots: '', voiceover: '',
+    bgm: '', transition: '', subtitle: '', tags: []
+  };
+
+  const modal = document.getElementById('modalOverlay');
+  const content = document.getElementById('modalContent');
+  content.innerHTML = `
+    <div class="modal-handle"></div>
+    <div class="modal-title">${isNew ? '🎬 新建脚本' : '✏️ 编辑脚本'}</div>
+    <div style="max-height:65vh;overflow-y:auto;padding-right:4px">
+
+      <div style="font-size:12px;font-weight:700;color:var(--pink-500);margin:10px 0 6px">📋 基础信息</div>
+      <div class="form-group">
+        <label class="form-label">标题 *</label>
+        <input class="form-input" id="scTitle" placeholder="视频标题..." value="${escapeHtml(s.title)}" maxlength="50">
+      </div>
+      <div class="form-group">
+        <label class="form-label">封面构思</label>
+        <input class="form-input" id="scCover" placeholder="封面画面描述..." value="${escapeHtml(s.coverIdea)}" maxlength="100">
+      </div>
+      <div style="display:flex;gap:8px">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">时长</label>
+          <input class="form-input" id="scDuration" placeholder="如 60s / 3min" value="${escapeHtml(s.duration)}" maxlength="10">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label">发布状态</label>
+          <select class="form-select" id="scStatus">
+            <option value="draft" ${s.status==='draft'?'selected':''}>📝 草稿</option>
+            <option value="ready" ${s.status==='ready'?'selected':''}>🎥 待拍</option>
+            <option value="filming" ${s.status==='filming'?'selected':''}>🎬 拍摄中</option>
+            <option value="editing" ${s.status==='editing'?'selected':''}>✂️ 剪辑中</option>
+            <option value="done" ${s.status==='done'?'selected':''}>✅ 已发布</option>
+          </select>
+        </div>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--pink-500);margin:10px 0 6px">📦 拍摄准备</div>
+      <div class="form-group">
+        <label class="form-label">拍摄产品清单</label>
+        <textarea class="form-input" id="scProducts" placeholder="需要展示的产品/品牌..." style="min-height:50px;resize:vertical">${escapeHtml(s.products)}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">道具布景</label>
+        <textarea class="form-input" id="scProps" placeholder="需要的道具、布景方案..." style="min-height:50px;resize:vertical">${escapeHtml(s.props)}</textarea>
+      </div>
+      <div class="form-group">
+        <label class="form-label">镜头要求</label>
+        <textarea class="form-input" id="scShots" placeholder="分镜要求、运镜方式、景别..." style="min-height:60px;resize:vertical">${escapeHtml(s.shots)}</textarea>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--pink-500);margin:10px 0 6px">🎙️ 口播文案</div>
+      <div class="form-group">
+        <label class="form-label">完整口播文案</label>
+        <textarea class="form-input" id="scVoice" placeholder="完整的口播稿，可分段..." style="min-height:100px;resize:vertical">${escapeHtml(s.voiceover)}</textarea>
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--pink-500);margin:10px 0 6px">✂️ 剪辑方案</div>
+      <div style="display:flex;gap:8px">
+        <div class="form-group" style="flex:1">
+          <label class="form-label">BGM</label>
+          <input class="form-input" id="scBgm" placeholder="背景音乐风格/曲名" value="${escapeHtml(s.bgm)}" maxlength="50">
+        </div>
+        <div class="form-group" style="flex:1">
+          <label class="form-label">转场</label>
+          <input class="form-input" id="scTransition" placeholder="转场风格" value="${escapeHtml(s.transition)}" maxlength="50">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">字幕</label>
+        <input class="form-input" id="scSubtitle" placeholder="字幕风格/特殊要求" value="${escapeHtml(s.subtitle)}" maxlength="100">
+      </div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--pink-500);margin:10px 0 6px">🏷️ 发布标签</div>
+      <div class="form-group">
+        <label class="form-label">标签（逗号分隔）</label>
+        <input class="form-input" id="scTags" placeholder="如：好物推荐,平价,测评" value="${escapeHtml((s.tags||[]).join(','))}" maxlength="100">
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary" id="saveScriptBtn" style="flex:1">💾 保存</button>
+      <button class="btn btn-secondary" id="cancelScriptBtn">取消</button>
+    </div>`;
+
+  modal.classList.add('active');
+
+  document.getElementById('cancelScriptBtn').addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+
+  document.getElementById('saveScriptBtn').addEventListener('click', () => {
+    const title = document.getElementById('scTitle').value.trim();
+    if (!title) { showToast('请输入标题'); return; }
+    const tagsRaw = document.getElementById('scTags').value.trim();
+    const tags = tagsRaw ? tagsRaw.split(/[,，]/).map(t=>t.trim()).filter(Boolean) : [];
+    const data = {
+      id: s.id || Date.now().toString(),
+      title,
+      coverIdea: document.getElementById('scCover').value.trim(),
+      duration: document.getElementById('scDuration').value.trim(),
+      status: document.getElementById('scStatus').value,
+      products: document.getElementById('scProducts').value.trim(),
+      props: document.getElementById('scProps').value.trim(),
+      shots: document.getElementById('scShots').value.trim(),
+      voiceover: document.getElementById('scVoice').value.trim(),
+      bgm: document.getElementById('scBgm').value.trim(),
+      transition: document.getElementById('scTransition').value.trim(),
+      subtitle: document.getElementById('scSubtitle').value.trim(),
+      tags,
+      createdAt: s.createdAt || Date.now(),
+      updatedAt: Date.now()
+    };
+    if (isNew) {
+      appData.scripts.push(data);
+    } else {
+      const idx = appData.scripts.findIndex(sc => sc.id === s.id);
+      if (idx >= 0) appData.scripts[idx] = data;
+    }
+    saveData();
+    modal.classList.remove('active');
+    renderPage('scripts');
+    showToast(isNew ? '✅ 脚本已创建！' : '✅ 脚本已更新！');
+  });
+}
+
+function exportScriptText(s) {
+  const statusMap = { draft: '草稿', ready: '待拍', filming: '拍摄中', editing: '剪辑中', done: '已发布' };
+  const text = `════════════════════════════════
+🎬 脚本：${s.title}
+════════════════════════════════
+
+【基础信息】
+标题：${s.title}
+封面构思：${s.coverIdea || '—'}
+时长：${s.duration || '—'}
+状态：${statusMap[s.status] || s.status}
+${s.tags && s.tags.length ? `标签：${s.tags.map(t=>'#'+t).join(' ')}` : ''}
+
+【拍摄产品清单】
+${s.products || '—'}
+
+【道具布景】
+${s.props || '—'}
+
+【镜头要求】
+${s.shots || '—'}
+
+【口播文案】
+${s.voiceover || '—'}
+
+【剪辑方案】
+BGM：${s.bgm || '—'}
+转场：${s.transition || '—'}
+字幕：${s.subtitle || '—'}
+
+════════════════════════════════
+导出时间：${new Date().toLocaleString('zh-CN')}`;
+
+  copyText(text);
+  showToast('📋 脚本文案已复制到剪贴板！');
 }
 
 function showImpactModal(title, impact) {
@@ -4313,7 +4773,8 @@ function renderPosturePage(container) {
   // 每个分类展示1个推荐
   Object.keys(postureVideoPool).forEach(cat => {
     const videos = postureVideoPool[cat];
-    const seed = (new Date().toDateString() + cat).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
+    const refreshSeed = appData._postureVideoSeed || 0;
+    const seed = (new Date().toDateString() + cat + refreshSeed).split('').reduce((a,c)=>a+c.charCodeAt(0),0);
     const video = videos[seed % videos.length];
     const isFav = (p.favorites || []).find(f => f.url === video.url);
     html += `
@@ -4696,6 +5157,17 @@ function escapeHtml(str) {
   const div = document.createElement('div');
   div.textContent = str;
   return div.innerHTML;
+}
+
+// 修复小红书搜索 URL — 把 keyword= 后面的中文编码
+function fixXhsUrl(url) {
+  if (!url) return '#';
+  // 如果 URL 里 keyword= 后面有未编码的中文，进行编码
+  return url.replace(/keyword=([^&]*)/g, (match, kw) => {
+    // 如果已经编码过（含%），不再重复编码
+    if (/%[0-9A-Fa-f]{2}/.test(kw)) return match;
+    return 'keyword=' + encodeURIComponent(kw);
+  });
 }
 
 function timeAgo(timestamp) {
