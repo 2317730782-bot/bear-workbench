@@ -4211,8 +4211,8 @@ function renderReadingPage(container) {
         </div>
         <p style="font-size:12px;line-height:1.5;margin-top:4px">${escapeHtml(t.text)}</p>
         <div style="display:flex;gap:6px;margin-top:6px">
-          <a href="https://weread.qq.com/web/search/${encodeURIComponent(t.title.replace(/^[📕📗📘📙📓📔📒]/,'').trim())}" target="_blank" rel="noopener" style="font-size:11px;color:var(--pink-500);text-decoration:none;background:var(--pink-50);padding:3px 10px;border-radius:12px">📖 微信读书</a>
-          <a href="https://book.douban.com/subject_search?search_text=${encodeURIComponent(t.title.replace(/^[📕📗📘📙📓📔📒]/,'').trim())}" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent-blue);text-decoration:none;background:#e8f0ff;padding:3px 10px;border-radius:12px">📚 豆瓣</a>
+          <a href="https://weread.qq.com/web/search/${encodeURIComponent(t.title)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--pink-500);text-decoration:none;background:var(--pink-50);padding:3px 10px;border-radius:12px">📖 微信读书</a>
+          <a href="https://book.douban.com/subject_search?search_text=${encodeURIComponent(t.title)}" target="_blank" rel="noopener" style="font-size:11px;color:var(--accent-blue);text-decoration:none;background:#e8f0ff;padding:3px 10px;border-radius:12px">📚 豆瓣</a>
         </div>
       </div>` },
     { key: 'aiVideos', title: 'AI学习视频', icon: '🤖', items: ri.aiVideos, render: (t) => `
